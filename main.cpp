@@ -7,7 +7,7 @@ int main () {
 
 		string p, mid;
 		int choice;
-		cout << "输入0: 前序 + 中序, 输入1: 后序加中序" << endl;
+		cout << "输入0: 前序 + 中序, 输入1: 后序 + 中序" << endl;
 		cin >> choice;
 		//string pre = "ABDFGCEH", mid = "BFDGACEH", post = "FGDBHECA";
 		//string pre = "GDAFEMHZ", mid = "ADEFGHMZ", post = "AEFDHZMG";
