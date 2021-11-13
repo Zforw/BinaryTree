@@ -4,7 +4,7 @@ template <class T>
 class BinTreeNode {
 public:
 	T data;
-	int _size, dir;
+	int _size, dir;//dir = 0 表示是左孩子
 	BinTreeNode<T>  *parent, *lChild, *rChild;
 	BinTreeNode() {
 		parent = lChild = rChild = nullptr;

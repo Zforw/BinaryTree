@@ -57,13 +57,12 @@ public:
 		show(root);
 	}
 private:
-	bool tag;
-	//根节点，左下角的节点
-	BinTreeNode<T> *root;
-	std::vector<int> HEIGHT, WIDTH;
-	std::vector<std::vector<int>> pos;
-	std::vector<std::vector<char>> output;
-	std::vector<std::vector<std::pair<char, std::pair<int, int>>>> ans;
+	bool tag;//输入正确/错误
+	BinTreeNode<T> *root;//根节点
+	std::vector<int> HEIGHT, WIDTH;//记录不同深度的树输出后的高度和宽度
+	std::vector<std::vector<int>> pos;//记录每一行的元素在树的位置
+	std::vector<std::vector<char>> output;//输出内容
+	std::vector<std::vector<std::pair<char, std::pair<int, int>>>> ans;////记录每一行元素的值
 	void destroy(BinTreeNode<T> *rt) {
 		if(rt) {
 			destroy(rt->lChild);
@@ -87,11 +86,9 @@ private:
 		else return totH(Height() - h);
 	}
 	std::queue<int> elemPos(int h) {
-		int minx = 100000;//左侧多余的空格
 		std::queue<int> q;
 		if(h == 0) {
 			q.push(totH(Height()) - 1);
-			minx = totH(Height()) - 1;
 		} else {
 			std::queue<int> p = elemPos(h - 1);
 			std::vector<int> t;
@@ -101,11 +98,7 @@ private:
 				t.push_back(u + dx(h));
 			}
 			for(int i = 0;i < pos[h].size();i++) {
-				if(pos[h][i]) {
-					q.push(t[i]);
-					minx = Min(minx, t[i]);
-				}
-				//测试
+				if(pos[h][i]) q.push(t[i]);
 			}
 		}
 		return q;
@@ -150,15 +143,15 @@ private:
 
 			if(u->lChild != nullptr) {
 				q.push(std::make_pair(u->lChild, 2 * d - 1));
-				tp.push_back(2 * d - 1);
+				tp.push_back(2 * d - 1);//左孩子是下一层的2*d-1个节点
 			} else {
-				tp.push_back(0);
+				tp.push_back(0);//左孩子为空pos记为0
 			}
 			if(u->rChild != nullptr) {
 				q.push(std::make_pair(u->rChild,2 * d));
-				tp.push_back(2 * d);
+				tp.push_back(2 * d);//右孩子是下一层的2*d-1个节点
 			} else {
-				tp.push_back(0);
+				tp.push_back(0);//右孩子为空pos记为0//siz用于记录每一层节点的个数，当前层已遍历的节点个数等于siz时，队列中的节点全部为当前层的孩子，用队列中节点的个数来更新下一层的siz
 			}
 			//k++;
 			if(tmp.size() == siz) {
@@ -170,42 +163,37 @@ private:
 			}
 		}
 
-		std::vector<std::pair<int,int>> last;//记录上一层节点的位置
+		std::vector<std::pair<int,int>> last;//记录上一层节点的位置, 用于连线
 		int elem_line = 0, ans_cnt = 0;
 		int last_pos = 0;
 		int k = 0;
 		std::vector<char> out;
 		for(int i = 0; i < totH(Height());i++) {
 			out.clear();
-			if(i == line(elem_line)) {
-				std::queue<int> elem_pos = elemPos(elem_line);
+			if(i == line(elem_line)) {//当前行有节点
+				std::queue<int> elem_pos = elemPos(elem_line);//获取节点位置
 				last.clear();
 				k = 0;
 				for(int j = 0;j < totW(Height());j++) {
-					if(!elem_pos.empty() && j == elem_pos.front()) {
+					if(!elem_pos.empty() && j == elem_pos.front()) {//当前位置j是节点
 						if(elem_line < Height() - 1) {
-							if(pos[elem_line + 1][2 * k] != 0) {
+							if(pos[elem_line + 1][2 * k] != 0) {//有左孩子
 								last.push_back(std::make_pair(j - 1, 0));
 							}
-							if(pos[elem_line + 1][2 * k + 1] != 0) {
+							if(pos[elem_line + 1][2 * k + 1] != 0) {//有右孩子
 								last.push_back(std::make_pair(j + 1, 1));
 							}
-							//std::cout << " k = " << k << ans[elem_line][ans_cnt] << ":" << pos[elem_line + 1][2 * k] << ", " << pos[elem_line + 1][2 * k + 1] << ";";
 							k++;
 						}
-						//std::cout << ans[elem_line][ans_cnt++] << " ";
-						out.push_back(ans[elem_line][ans_cnt++].first);
+						out.push_back(ans[elem_line][ans_cnt++].first);//将节点数据添加到输出数组里
 						ans[elem_line][ans_cnt - 1].second = std::make_pair(i, j);
-						//out.push_back(ans[elem_line][ans_cnt++]);
 						out.push_back(' ');
 						elem_pos.pop();
 					} else {
-						//std::cout << "  ";
 						out.push_back(' ');
 						out.push_back(' ');
 					}
 				}
-				//std::cout << std::endl;
 				output.push_back(out);
 				out.clear();
 				elem_line++;
@@ -214,57 +202,27 @@ private:
 				last_pos = 0;
 				for(int j = 0; j < totW(Height());j++) {
 					if (last_pos < last.size() && j == last[last_pos].first) {
-						if(last[last_pos].second) {
-							//std::cout << "\\ ";
+						if(last[last_pos].second) {//根据last进行画线, 若有右孩子
 							out.push_back('\\');
 							out.push_back(' ');
-							last[last_pos].first++;
-						} else {
-							//std::cout << "/ ";
+							last[last_pos].first++;//列坐标+1
+						} else {//若有左孩子
 							out.push_back('/');
 							out.push_back(' ');
-							last[last_pos].first--;
+							last[last_pos].first--;//列坐标-1
 						}
 						last_pos++;
 					}
 					else {
-						//std::cout << "  ";
 						out.push_back(' ');
 						out.push_back(' ');
 					}
-					//判断在一条直线上
-					//只有一个子树的情况
 				}
-				//std::cout << std::endl;
 				output.push_back(out);
 				out.clear();
 			}
 		}
-		for(int i = 0;i < output.size();i++) {
-			for(int j = 0;j < output[i].size();j++) {
-				std::cout << output[i][j];
-			}
-			std::cout << std::endl;
-		}
-		std::cout << std::endl;
 
-		/*
-
-		for(int i = 0;i < ans.size();i ++) {
-			for(int j = 0;j < ans[i].size();j++) {
-				std::cout << ans[i][j].first << " ";
-			}
-			std::cout << std::endl;
-		}
-		//pos 最后一行全是0
-		for(int i = 0;i < pos.size() - 1;i ++) {
-			for(int j = 0;j < pos[i].size();j++) {
-				std::cout << pos[i][j] << " ";
-			}
-			std::cout << std::endl;
-		}
-		std::cout << std::endl;
-		*/
 
 	}
 
@@ -291,47 +249,30 @@ private:
 		}
 	}
 	void postShow(std::string post) {
-		preShow(root);
-
+		preShow(root);//保存树的形态，进行选择性输出
 		for(int h = 1;h <= Height();h++) {
 			HEIGHT.push_back(totH(h));
 			WIDTH.push_back(totW(h));
 		}
-		for(int h = 0;h < HEIGHT.size();h++) {
-			std::cout << HEIGHT[h] << " ";
-		}
-		std::cout << std::endl;
-		for(int h = 0;h < WIDTH.size();h++) {
-			std::cout << WIDTH[h] << " ";
-		}
-		std::cout << std::endl;
 		int maxJ = -1, minI = 100000;
-		//int low = -1;
-		std::vector<int> end;
-
+		std::vector<int> end;//end 记录每一行输出的最后位置
 		for(int i = 0;i < HEIGHT[HEIGHT.size() - 1];i++) {
 			end.push_back(0);
 		}
 		for(int ps = 0; ps < post.length();ps++) {
-			std::cout << "第" << ps + 1 << "次:" << std::endl;
 			int isR = 0, isL = 0;
 			std::pair<int, int> rc = findPos(post[ps], isR, isL);
 			minI = Min(rc.first, minI);
 			maxJ = Max(rc.second, maxJ);
-			/*
-			if(end[rc.first].first < rc.second) {
-				end[rc.first].first = rc.second;
-				end[rc.first].second = ps;
-			}
-			 */
 			for(int i = minI;i < HEIGHT[HEIGHT.size() - 1];i++) {
 				if(i == rc.first) {
 					for(int j = 0;j <= rc.second * 2;j++) {
 						std::cout << output[i][j];
 					}
 					end[i] = rc.second * 2;
-					if(isR) {
+					if(isR) {//若是右孩子
 						int p;
+						//找到上一层节点在输出数组中的高度
 						for(p = 0;p < HEIGHT.size();) {
 							if(HEIGHT[p] == HEIGHT[HEIGHT.size() - 1] - i) {
 								break;
@@ -339,10 +280,11 @@ private:
 								p++;
 							}
 						}
+						//更新上一层到上一层节点所在行输出的最后位置，每一层都-1， 使得输出内容只到右孩子之上的连线 \ 截止
 						for(int r = i - 1;r > HEIGHT[HEIGHT.size() - 1] - HEIGHT[p + 1];r--) {
 							end[r] = end[r + 1] - 1;
 						}
-					} else if(isL) {
+					} else if(isL) {//若是左孩子
 						int p;
 						for (p = 0; p < HEIGHT.size ();) {
 							if (HEIGHT[p] == HEIGHT[HEIGHT.size () - 1] - i) {
@@ -357,7 +299,6 @@ private:
 							}
 						}
 					}
-
 				} else {
 					for (int j = 0; j <= Min(maxJ * 2, end[i]); j ++) {
 						std::cout << output[i][j];
@@ -367,8 +308,6 @@ private:
 			}
 			std::cout << std::endl;
 		}
-
-
 	}
 	BinTreeNode<T> * preOrder(std::string pre, std::string mid, BinTreeNode<T> *prt, bool dir) {
 		if(pre.length() == 0 && mid.length() == 0) return nullptr;
@@ -384,6 +323,13 @@ private:
 		BinTreeNode<T> *rt = new BinTreeNode<T> (pre[0], prt, nullptr, nullptr, dir);
 		if(root == nullptr) root = rt;
 		preShow(root);
+		for(int i = 0;i < output.size();i++) {
+			for(int j = 0;j < output[i].size();j++) {
+				std::cout << output[i][j];
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
 		BinTreeNode<T> *l = preOrder(pre.substr(1, m), mid.substr(0, m), rt, 0);
 		BinTreeNode<T> *r = preOrder(pre.substr(m + 1, n - m - 1), mid.substr(m + 1, n - m - 1), rt, 1);
 		rt->lChild = l;

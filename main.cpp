@@ -3,16 +3,15 @@
 using namespace std;
 bool CheckDuplicate(const string&, const string&);
 int main () {
+	//string pre = "ABDFGCEH", mid = "BFDGACEH", post = "FGDBHECA";
+	//string pre = "GDAFEMHZ", mid = "ADEFGHMZ", post = "AEFDHZMG";
+	//string pre = "ABCDEFGH", mid = "CEDFBAGH", post = "EFDCBHGA";
+	//string pre = "ABDHIEJKCFLMGNO", mid = "HDIBJEKALFMCNGO", post = "HIDJKEBLMFNOGCA";
 	while(true) {
-
 		string p, mid;
 		int choice;
 		cout << "输入0: 前序 + 中序, 输入1: 后序 + 中序" << endl;
 		cin >> choice;
-		//string pre = "ABDFGCEH", mid = "BFDGACEH", post = "FGDBHECA";
-		//string pre = "GDAFEMHZ", mid = "ADEFGHMZ", post = "AEFDHZMG";
-		//string pre = "ABCDEFGH", mid = "CEDFBAGH", post = "EFDCBHGA";
-		//string pre = "ABDHIEJKCFLMGNO", mid = "HDIBJEKALFMCNGO", post = "HIDJKEBLMFNOGCA";
 		if(choice != 0 && choice != 1) {
 			cout << "输入有误!" << endl;
 			continue;
